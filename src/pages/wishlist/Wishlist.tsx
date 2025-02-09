@@ -12,7 +12,7 @@ interface Product {
 
 const Wishlist: React.FC = () => {
   const [wishlist, setWishlist] = useState<Product[]>([]);
-
+    
   useEffect(() => {
     const storedWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
     setWishlist(storedWishlist);
@@ -29,6 +29,9 @@ const Wishlist: React.FC = () => {
     const updatedCart = [...cart, { ...product, quantity: 1 }];
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
+  useEffect(()=>{
+      window.scrollTo(0,0);
+    },[])
 
   return (
     <div className="container mx-auto py-10">

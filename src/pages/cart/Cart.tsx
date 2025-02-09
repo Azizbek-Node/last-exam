@@ -43,6 +43,9 @@ const Cart = () => {
     const itemTotal = (item.price || 0) * (item.quantity || 1);
     return acc + itemTotal;
   }, 0);
+  useEffect(()=>{
+      window.scrollTo(0,0);
+    },[])
 
   return (
     <div className="container mx-auto py-10 px-4">
