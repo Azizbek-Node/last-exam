@@ -2,14 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import foto from "@/assets/images/123.jpg";
+import { useLoginMutation } from "@/redux/api/auth-api";
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [login, { isLoading }] = useLoginMutation();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,25 +15,9 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
-      const response = await fetch("https://dummyjson.com/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Invalid username or password");
-      }
-
-      const data = await response.json();
+      const data = await login(formData).unwrap();
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       toast.success("Logged in successfully!");
@@ -43,8 +25,6 @@ const SignIn = () => {
     } catch (error) {
       console.error(error);
       toast.error("Invalid username or password!");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -80,9 +60,9 @@ const SignIn = () => {
             <button
               type="submit"
               className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-              disabled={loading}
+              disabled={isLoading}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {isLoading ? "Signing in..." : "Sign In"}
             </button>
           </form>
           <p className="text-sm text-center mt-4">

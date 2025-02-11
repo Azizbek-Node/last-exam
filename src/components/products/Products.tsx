@@ -1,35 +1,27 @@
-import { useEffect, useState } from "react";
 import { FaRegHeart, FaHeart, FaShoppingCart, FaCheck } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  rating: number;
-  images: string[];
-  brand: string;
-}
+import { useState } from "react";
+import { IProduct } from "@/types";
+import { useGetProductsQuery } from "@/redux/api/product-api";
 
 const Products: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [wishlist, setWishlist] = useState<Product[]>([]);
-  const [cart, setCart] = useState<Product[]>([]);
+  const { data, isLoading, isError } = useGetProductsQuery({});
+  const products = data?.products || [];
+
+  const [wishlist, setWishlist] = useState<IProduct[]>(
+    JSON.parse(localStorage.getItem("wishlist") || "[]")
+  );
+  const [cart, setCart] = useState<IProduct[]>(
+    JSON.parse(localStorage.getItem("cart") || "[]")
+  );
   const [visibleCount, setVisibleCount] = useState(8);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch("https://dummyjson.com/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data.products))
-      .catch((err) => console.error("Error fetching products:", err));
+  if (isLoading) return <p className="text-center">Loading...</p>;
+  if (isError) return <p className="text-center text-red-500">Error fetching products.</p>;
 
-    setWishlist(JSON.parse(localStorage.getItem("wishlist") || "[]"));
-    setCart(JSON.parse(localStorage.getItem("cart") || "[]"));
-  }, []);
-
-  const handleWishlistToggle = (product: Product) => {
+  const handleWishlistToggle = (product: IProduct) => {
     let updatedWishlist = wishlist.some((item) => item.id === product.id)
       ? wishlist.filter((item) => item.id !== product.id)
       : [...wishlist, product];
@@ -38,7 +30,7 @@ const Products: React.FC = () => {
     localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
   };
 
-  const handleCartToggle = (product: Product) => {
+  const handleCartToggle = (product: IProduct) => {
     let updatedCart = cart.some((item) => item.id === product.id)
       ? cart.filter((item) => item.id !== product.id)
       : [...cart, product];
@@ -84,19 +76,18 @@ const Products: React.FC = () => {
             </h3>
             <p className="text-[#DB4444] font-bold">${product.price}</p>
 
-
             <div className="relative">
               {cart.some((item) => item.id === product.id) ? (
                 <button
                   onClick={() => handleCartToggle(product)}
-                  className="w-full py-2 mt-3 bg-black text-white rounded-md hover:bg-gray-800 transition flex items-center justify-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                  className="w-full py-2 mt-3 bg-gray-600 text-white rounded-md transition flex items-center justify-center gap-2"
                 >
                   <FaCheck className="text-xl" /> Added to Cart
                 </button>
               ) : (
                 <button
                   onClick={() => handleCartToggle(product)}
-                  className="w-full py-2 mt-3 bg-black text-white rounded-md hover:bg-gray-800 transition flex items-center justify-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                  className="w-full py-2 mt-3 bg-black text-white rounded-md hover:bg-gray-800 transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100"
                 >
                   <FaShoppingCart className="text-xl" /> Add to Cart
                 </button>

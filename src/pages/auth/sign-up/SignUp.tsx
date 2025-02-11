@@ -138,14 +138,12 @@ const SignUp = () => {
           Already have an account?{" "}
           <span
 
-className="text-blue-600 cursor-pointer"
-onClick={() => navigate("/auth/sign-in")}
->
-Sign In
-</span>
-</p>
-</div>
-</div>
+          className="text-blue-600 cursor-pointer"
+        onClick={() => navigate("/auth/sign-in")}
+          >Sign In</span>
+        </p>
+      </div>
+   </div>
 );
 };
 
